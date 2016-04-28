@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <title>MIX and MATCH</title>
+ 
+        <script src="jquery-1.12.1.js" type="text/javascript"></script>
+        <script src="jquery.mobile-1.4.5/jquery.mobile-1.4.5.js" type="text/javascript"></script>
+
+        <script src="RGB_Levels/averagelevel_rgbmatch/libraries/p5.js" type="text/javascript"></script>
+        <script src="RGB_Levels/averagelevel_rgbmatch/libraries/p5.dom.js" type="text/javascript"></script>
+        <script src="RGB_Levels/averagelevel_rgbmatch/libraries/p5.sound.js" type="text/javascript"></script>
+        <script src="https://code.jquery.com/jquery-2.2.1.js"></script>
+       <!--  <script src="sketch.js" type="text/javascript"></script> -->
+        
+        <script type="text/javascript" src="render.js"></script>
+
+        <link rel="stylesheet" href="themes/colors.min.css" />
+        <link rel="stylesheet" href="themes/jquery.mobile.icons.min.css" />
+        <link rel="stylesheet" href="jquery.mobile-1.4.5/jquery.mobile-1.4.5.css" />
+
+<!-- style BORDER ON P5 canvas -->
+
+        <style>
+            img {
+                width: 100%;
+                border: 2px solid #ffffff;
+                }
+            body {
+                padding: 0; 
+                margin: 0;
+                } 
+            canvas {vertical-align: top;}
+        </style>
+        
+
+       <meta name="viewport" content="width=device-width"/>
+
+<!-- SAVE SETTINGS! -->
+
+<!--        <script type="text/javascript">
+
+      var settingsdata = [];
+
+      window.addEventListener('load', function() {
+
+        var lastValue = localStorage.getItem("settingsarray");
+        if (lastValue != null) {
+
+
+          settingsdata = JSON.parse(lastValue);
+          console.log(settingsdata);
+          //lastValue = JSON.parse(lastValue);
+
+            document.getElementById("username").value = settingsdata[settingsdata.length-1].name;
+            document.getElementById("rb1").checked = lastValue[settingsdata.length-1].easy;
+            document.getElementById("rb2").checked = lastValue[settingsdata.length-1].average;
+            document.getElementById("rb3").checked = lastValue[settingsdata.length-1].difficult;
+
+        }
+
+        document.getElementById("savebutton").addEventListener('click', function() {
+            //alert(document.getElementById("nametext").value);
+
+            var settingsdetails = {};
+            settingsdetails.name = document.getElementById("username").value;
+            settingsdetails.easy = document.getElementById("rb1").checked;
+            settingsdetails.average = document.getElementById("rb2").checked;
+            settingsdetails.difficult = document.getElementById("rb3").checked;
+            settingsdata.push(settingsdetails);
+
+            localStorage.setItem('settingsarray',JSON.stringify(settingsdata));
+
+        });
+      });
+
+    </script> -->
+
+<!-- SOCKET STUFF!! -->
+
+       <script src="socket.io.js"></script>
+       <script>
+            var socket = io.connect('http://192.241.181.115:8080/');
+            
+            socket.on('connect', function() {
+                console.log("Connected");
+            });
+
+        //triggers when player pressed compete button
+            var newPlayer = function() {
+            socket.emit('newplayer');
+            console.log("new player sent");
+
+            // socket.on('availableplayers', function(readytoplay){
+            //     for (var i = 0; i < readytoplay.length; i++){
+            //             var stuff = $('#myDivofPlayers').html();
+            //             $('#myDivofPlayers').html( stuff + readytoplay[i].name);
+            //         }
+
+            //     if(readytoplay)
+            //     }
+            }
+
+            socket.on('startplay', function(colors){
+                r = colors.r
+                g = colors.g
+                b = colors.b
+
+                console.log(colors);
+                // pls();
+                window.location.hash = '#thirdpage';
+                gameStart();
+                console.log("play started");
+            });     
+
+            socket.on('youlost', function(){
+                window.location.hash = '#fifthpage';
+                console.log("player lost");
+            }); 
+
+        
+
+        //tellserver we have a winner so other players can be informs they lost
+        function newWinner(){
+        socket.emit('newwinner');
+        }
+
+        </script>
+        
+    </head>
+
+<!-- APP BUILD OUT -->
+
+    <body>
+
+        <!-- This is the start page -->
+        <section id="firstpage" data-role="page" data-theme="a">
+            <div data-role="header">
+                <h1>MIX and MATCH!!</h1>
+            </div>
+
+            <div style="padding: 10px 30px;">
+
+                <h3 style="text-align: center"> Mix Red, Green, and Blue values and race to match the color.</h3>
+
+                 <img src="RGBimage.png" alt="logo" style="display: block; width: 150px; margin: auto;}">
+
+            </div>
+
+            <div class="content" class="ui-content" role="main">
+                <a href="compete.html" rel="external" class="ui-btn ui-shadow">Home</a>
+                <a href="#secondpage" class="ui-btn ui-shadow" onclick="newPlayer();">Look for Players</a>
+            </div>
+
+        </section>
+
+        <!-- This is the waiting page -->
+        <div id="secondpage" data-role="page" data-close-btn="right" data-theme="a">
+
+        <h2> Waiting for players...</h2>
+
+        <script>
+        // When entering waiting page (on page load) trigger newPlayer()
+        // $(document).on("pagecontainershow","#secondpage",function(){ 
+        //    newPlayer();
+        //     });
+        </script>
+
+        <div id="myDivofPlayers"></div>
+
+        </div>    
+
+        <!-- This is the COMPETE page -->
+        <div id="thirdpage" data-role="page" data-theme="b">
+            <div data-role="header">
+                <h1>Get Mixing!</h1>
+            </div>
+
+            <div class="ui-content" role="main">
+                
+               <div id="sketch-container">
+                
+                </div>
+
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+
+                <form method="get" action="">
+                  <fieldset class="ui-field-contain">
+
+                    <fieldset class="ui-grid-a">
+                    <div class="ui-block-a"><span id="timer">Timer: 60</span></div>
+                    <div class="ui-block-b"><div id="score">Score: 0</div></div>   
+
+                </fieldset>
+                    
+                    <br/>
+
+                    <label for="num">Red:</label>
+                    <input type="range" name="redslider" id="redslider" value="25" min="0" max="255" />
+
+                    <label for="num">Green:</label>
+                    <input type="range" name="greenslider" id="greenslider" value="25" min="0" max="255" />
+
+                    <label for="num">Blue:</label>
+                    <input type="range" name="blueslider" id="blueslider" value="25" min="0" max="255" />
+
+                  </fieldset>
+                </form>
+
+
+                <div class="ui-grid-a">
+                  <!--   <div class="ui-block-a"><p><a href="#secondpage" class="ui-btn">settings</a></p></div> -->
+
+                <div class="ui-block-b"><p><a href="#firstpage" class="ui-btn" data-transition="flip">home</a></p></div>
+
+                </div>
+            </div>    
+        </div>
+
+        <!-- This is the win screen -->
+        <div id="forthpage" data-role="page" data-dialog="true" data-theme="a">
+            <div data-role="header">
+                <h1>RGB COMPETE!!</h1>
+            </div>
+
+
+            <div class="ui-content" role="main">
+                <h3>You Won!</h3>
+
+                <!-- <a href="#thirdpage" class="ui-btn">Keep Playing</a> -->
+                <button id="win-button" class="ui-btn"> Keep Playing </button>
+
+                <script>
+                document.getElementById("win-button").addEventListener("click", function(){
+                        window.location.hash = '#secondpage';
+                        reStart();
+                        newPlayer();
+                    } );
+                </script>
+
+            
+            </div>    
+        </div>
+
+        <!-- This is the Lose screen -->
+        <div id="fifthpage" data-role="page" data-dialog="true" data-theme="a">
+            <div data-role="header">
+                <h1>MIX and MATCH!!</h1>
+            </div>
+
+
+            <div class="ui-content" role="main">
+                <h3>You Lost!</h3>
+
+                <!-- <a href="#thirdpage" class="ui-btn">Keep Playing</a> -->
+                <button id="lose-button" class="ui-btn">Try again!</button>
+
+                <script>
+                document.getElementById("lose-button").addEventListener("click", function(){
+                        window.location.hash = '#secondpage';
+                        reStart();
+                        newPlayer();
+                    } );
+                </script>
+
+            
+            </div>    
+        </div>
+
+        <!-- link to p5 sketch -->
+        <script src="RGB_Levels/averagelevel_rgbmatch/sketch.js" type="text/javascript"></script>
+
+    </body>
+</html>

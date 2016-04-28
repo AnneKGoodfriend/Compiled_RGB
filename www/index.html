@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <title>MIX + MATCH</title>
+       <!--  <meta charset="utf-8" /> -->
+      <!--   <meta name="format-detection" content="telephone=no" />
+        <meta name="msapplication-tap-highlight" content="no" /> -->
+       <!--  <script type="text/javascript" src="cordova.js"></script> -->
+        <!-- <script type="text/javascript" src="js/index.js"></script> -->
+ 
+        <script src="jquery-1.12.1.js" type="text/javascript"></script>
+        <script src="jquery.mobile-1.4.5/jquery.mobile-1.4.5.js" type="text/javascript"></script>
+
+        <script src="gamescripts/practice_rgbmatch/libraries/p5.js" type="text/javascript"></script>
+         <script src="gamescripts/practice_rgbmatch/libraries/p5.dom.js" type="text/javascript"></script>
+        <script src="https://code.jquery.com/jquery-2.2.1.js"></script>
+       <!--  <script src="sketch.js" type="text/javascript"></script> -->
+        
+        <script type="text/javascript" src="render.js"></script>
+
+        <link rel="stylesheet" href="themes/puple.min.css" />
+        <link rel="stylesheet" href="themes/jquery.mobile.icons.min.css" />
+        <link rel="stylesheet" href="jquery.mobile-1.4.5/jquery.mobile-1.4.5.css" />
+
+        <style>
+            img {
+                width: 100%;
+                }
+            body {
+                padding: 0; 
+                margin: 0;
+                } 
+            canvas {vertical-align: top;}
+
+
+        </style>
+        
+
+       <meta name="viewport" content="width=device-width"/>
+
+       <script type="text/javascript">
+
+      var settingsdata = [];
+
+      window.addEventListener('load', function() {
+
+        var lastValue = localStorage.getItem("settingsarray");
+        if (lastValue != null) {
+
+
+          settingsdata = JSON.parse(lastValue);
+          console.log(settingsdata);
+          //lastValue = JSON.parse(lastValue);
+
+            document.getElementById("username").value = settingsdata[settingsdata.length-1].name;
+
+        }
+
+        document.getElementById("username").addEventListener('input', function() {
+            //alert(document.getElementById("nametext").value);
+
+            var settingsdetails = {};
+            settingsdetails.name = document.getElementById("username").value;
+            settingsdata.push(settingsdetails);
+
+            localStorage.setItem('settingsarray',JSON.stringify(settingsdata));
+
+        });
+      });
+
+    </script>
+        
+    </head>
+    <body>
+
+         <!-- This is the start page -->
+        <section id="firstpage" data-role="page" data-theme="c">
+            <div data-role="header">
+                <h2> MIX and MATCH! </h2>
+            </div>
+
+            <div style="padding: 10px 30px;">
+
+                <h3 style="text-align: center"> Mix Red, Green, and Blue values and race to match the color.</h3>
+
+                 <img src="RGBimage.png" alt="logo" style="display: block; width: 150px; margin: auto;}">
+
+            </div>
+
+            <div class="content" class="ui-content" role="main" style="padding: 10px 25px 30px 25px;">
+                <a href="#thirdpage" class="ui-btn ui-shadow">PRACTICE</a>
+                <a href="compete.html" onclick="return gameStart();" rel="external" class="ui-btn ui-shadow">COMPETE</a>
+
+                <a href="#secondpage" class="ui-btn ui-shadow">STATS</a>
+            </div>
+
+            <div data-role="footer">
+             <h1>r + g + b = fun</h1>
+            </div>
+
+        </section>
+
+        <!-- This is the settings page -->
+        <div id="secondpage" data-role="page" data-theme="c">
+            <div data-role="header">
+                <h1>MIX and MATCH!</h1>
+            </div>
+
+            <div class="ui-content" role="main">
+                <h3>User Name:</h3>
+
+
+                <form method="get" action="">
+                    <!-- <label for="username">User Name:</label> -->
+                    <input type="text" name="username" id="username" value="" placeholder="Enter Username"/>
+               </form>
+
+             <!--   <button id="savebutton" class="ui-btn ui-mini">Save</button> -->
+               <h3>Stats: </h3>
+
+                <ul data-role="listview" style="padding: 20px 10px 30px 10px">
+                    <li>Competitions Won:<span class="ui-li-count">0</span></li>
+                    <li>Competitions Lost:<span class="ui-li-count">0</span></li>
+                </ul>
+                
+                <div>
+                  <nav data-role="navbar" style="padding: 20px 10px 20px 10px">
+                    <ul>
+                        <li><a href="#firstpage" class="ui-btn ui-btn-active ">Home</a></li>
+                        <li><a href="#thirdpage" class="ui-btn ">Practice</a></li>
+                        <li><a href="compete.html" rel="external" onclick="return gameStart();"class="ui-btn">Compete</a></li>
+                        
+                    </ul>
+                  </nav>
+                </div>
+
+                </div>
+
+                <div data-role="footer">
+                    <h1>R + G + B = FUN!</h1>
+                </div>
+
+        </div>    
+
+         <!-- This is the game page -->
+        <div id="thirdpage" data-role="page" data-theme="c">
+            <div data-role="header">
+                <h1>Get Mixing!</h1>
+            </div>
+
+            <div class="ui-content" role="main">
+                
+               <div id="sketch-container" style="padding: 15px 20px 160px 20px ">
+                
+                </div>
+
+                <form method="get" action="">
+                  <fieldset class="ui-field-contain">
+
+                    <fieldset class="ui-grid-a">
+                    <div class="ui-block-a"><span id="timer">Timer: 60</span></div>
+                    <div class="ui-block-b"><div id="score">Score: 0</div></div>    
+                </fieldset>
+                    
+                    <br/>
+
+                    <label for="num">Red:</label>
+                    <input type="range" name="redslider" id="redslider" value="25" min="0" max="255" />
+
+                    <label for="num">Green:</label>
+                    <input type="range" name="greenslider" id="greenslider" value="25" min="0" max="255" />
+
+                    <label for="num">Blue:</label>
+                    <input type="range" name="blueslider" id="blueslider" value="25" min="0" max="255" />
+
+                  </fieldset>
+                </form>
+
+                <div>
+                  <nav data-role="navbar" style="padding: 20px 10px 20px 10px">
+                    <ul>
+                        <li><a href="#firstpage" class="ui-btn ui-btn-active ">Home</a></li>
+                        <li><a href="#secondpage" class="ui-btn ">Stats</a></li>
+                        <li><a href="compete.html" rel="external" class="ui-btn">Compete</a></li>
+                        
+                    </ul>
+                  </nav>
+                </div>
+
+
+             <!--    <div class="ui-grid-a">
+                    <div class="ui-block-a"><p><a href="#secondpage" class="ui-btn">settings</a></p></div>
+
+                    <div class="ui-block-b"><p><a href="#firstpage" class="ui-btn" data-transition="flip">home</a></p></div>
+
+                </div> -->
+
+            <div data-role="footer">
+                <h1>pratice makes perfect :)</h1>
+            </div>
+
+            </div>    
+        </div>
+
+                 <!-- This is the win screen -->
+        <div id="forthpage" data-role="page" data-dialog="true" data-theme="c">
+            <div data-role="header">
+                <h1>MIX and MATCH!</h1>
+            </div>
+
+
+            <div class="ui-content" role="main">
+                <h3>You Won!</h3>
+
+                <!-- <a href="#thirdpage" class="ui-btn">Keep Playing</a> -->
+                <button id="win-button" class="ui-btn" >Keep Playing</button>
+
+                <script>
+                document.getElementById("win-button").addEventListener("click", function(){
+                        window.location.hash = '#thirdpage';
+                        reStart();
+                    } );
+                </script>
+
+            
+            </div>    
+        </div>
+
+                     <!-- This is the Lose screen -->
+        <div id="fifthpage" data-role="page" data-dialog="true" data-theme="c">
+            <div data-role="header">
+                <h1>MIX and MATCH!</h1>
+            </div>
+
+
+            <div class="ui-content" role="main">
+                <h3>You Lost!</h3>
+
+                <!-- <a href="#thirdpage" class="ui-btn">Keep Playing</a> -->
+                <button id="lose-button" class="ui-btn">Try again!</button>
+
+                <script>
+                document.getElementById("lose-button").addEventListener("click", function(){
+                        window.location.hash = '#thirdpage';
+                        reStart();
+                    } );
+                </script>
+
+            
+            </div>    
+        </div>
+
+        <script src="gamescripts/practice_rgbmatch/sketch.js" type="text/javascript"></script>
+
+    </body>
+</html>
