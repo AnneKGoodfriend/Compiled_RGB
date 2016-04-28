@@ -84,9 +84,14 @@ function draw() {
 // }
 }
 
-$(document).on("pageshow","#thirdpage",function(){ // When entering pagetwo
-   firstCount=true;
-});
+//start timer on game load
+function gameStart(){
+  firstCount=true
+}
+
+// $(document).on("pageshow","#thirdpage",function(){ // When entering pagetwo
+//    firstCount=true;
+// });
 
 function reStart() {
 
